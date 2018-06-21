@@ -1,0 +1,40 @@
+{
+    "type": "weapon",
+    "items": [{
+            "name": "Axe of Valor",
+            "type": "weapon",
+            "description": "This axe is said to have been forged at the beginning of time, by the very gods themseleves. For this reason, it's power is unmatched by all.",
+            "attributes": {
+                "damage": 10,
+                "pickup_message": "A sense of warmth and valor flows through your bones when you pick this up.",
+                "luck": 100,
+                "success_action_phrases": [
+                    "The axe swings in a graceful motion, cutting into its foe with grace and elegance.",
+                    "With beauty, the axe lightly swings into the foe."
+                ],
+                "failure_action_phrases": [
+                    "Uh-oh. The axe, in all its might and valor, fails to hit the enemy."
+                ],
+                "xp_level": 100
+            }
+        },
+        {
+            "name": "Sword of Stealth",
+            "type": "weapon",
+            "description": "Crafted by the shadows themselves, this weapon is silent but deadly.",
+            "attributes": {
+                "damage": 8,
+                "pickup_message": "The handle feels cold, like the feeling of darkness itself. You shudder.",
+                "luck": 80,
+                "success_action_phrases": [
+                    "With a cold, slick motion, the blade cuts into the enemy with a serene sharpness.",
+                    "The black blade vanishes into the enemy before quickly being drawn out in a moment of tension."
+                ],
+                "failure_action_phrases": [
+                    "The blade just misses the target."
+                ],
+                "xp_level": 100
+            }
+        }
+    ]
+}
