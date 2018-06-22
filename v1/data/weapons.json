@@ -1,32 +1,39 @@
 {
     "type": "weapon",
     "items": [{
-            "name": "Axe of Valor",
+            "name": "Shoddy Dagger",
             "type": "weapon",
-            "description": "This axe is said to have been forged at the beginning of time, by the very gods themseleves. For this reason, it's power is unmatched by all.",
+            "description": "This dagger is really, really poorly made. You swear that the blade wiggles around when you shake it.",
             "attributes": {
-                "damage": 10,
-                "pickup_message": "A sense of warmth and valor flows through your bones when you pick this up.",
-                "luck": 100,
+                "damage": "1d4",
+                "pickup_message": "When you pick up the dagger, you actually feel slighly disgusted that this is the best you've got. It works though (not very well, however).",
+                "luck": 10,
                 "success_action_phrases": [
-                    "The axe swings in a graceful motion, cutting into its foe with grace and elegance.",
-                    "With beauty, the axe lightly swings into the foe."
+                    "The floppy blade just manages to pierce the flesh of your enemy.",
+                    "In all its shoddyness, the dagger just finds place inside your enemy.",
+                    "The blade flops into the enemy with a satisfying slap noise, before being quickly retracted.",
+                    "It just manages to stab the enemy."
                 ],
                 "failure_action_phrases": [
-                    "Uh-oh. The axe, in all its might and valor, fails to hit the enemy."
+                    "It's pretty hard to hit anything with this dagger, it's flopping about the entire time.",
+                    "You try to go for a stab, but the blade basically hinges to the side and the blunt part of the blade pushes up against the enemy.",
+                    "The blade just misses the target, flopping all over the place.",
+                    "I mean the dagger does basically no damage anyway, but you might as well try and hit something with it.",
                 ],
-                "xp_level": 100
+                "xp_level": 10
             }
         },
         {
-            "name": "Sword of Stealth",
+            "name": "Shoddy Greatsword",
             "type": "weapon",
-            "description": "Crafted by the shadows themselves, this weapon is silent but deadly.",
+            "description": "The sword looks like it was made by a three year old on a sugar rush. It's incredibly top heavy, part of the handle has fallen off so it's hard to grip and it's so blunt and fragile you swear if you try to cut a tomato with it, the tomato would probably cut the blade.",
             "attributes": {
-                "damage": 8,
-                "pickup_message": "The handle feels cold, like the feeling of darkness itself. You shudder.",
-                "luck": 80,
-                "success_action_phrases": [
+                "damage": "2d6",
+                "pickup_message": "When you pick up the sword, you really wish you had something slightly better. Maybe at least something that could possible actually hurt something.",
+                "luck": 15,
+                HEY OLLY YES OLLY YOU NEED TO WRITE THE "success_action_phrases"
+                and the "failure_action_phrases"
+                OK "success_action_phrases": [
                     "With a cold, slick motion, the blade cuts into the enemy with a serene sharpness.",
                     "The black blade vanishes into the enemy before quickly being drawn out in a moment of tension."
                 ],

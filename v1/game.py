@@ -1,4 +1,4 @@
-# Certo v1, a super simple text adventure game.
+# Certo v1, a simple text adventure game.
 
 import cmd
 import sys
@@ -20,10 +20,10 @@ SCREEN_WIDTH = 100
 DEFAULT_DELAY = [0.1, 0.2]
 
 # Controls if the user should have to hit enter at the end of every line of written text.
-DEFAULT_INPUT = True
+DEFAULT_INPUT = False
 
 # Speeds up/slows down all wait times to make gameplay faster. 2 = twice as fast, 0.5 = double speed.
-SPEED_MODIFIER = 10
+SPEED_MODIFIER = 3
 
 # Defines wether to use the command prompt commands to clear the screen, or just print a bunch of times. Useful for when testing the code using IDLE. The first value is whether to do so, and the second value is the amount of times.
 CLEAR_PRINT = [False, 100]
@@ -276,7 +276,7 @@ class Player():
         [mana] => Similar to health, how much 'magical health' the character has. Once again, a list with the first element being the current health and the second being the max.
         [xp] => A single integer which stores how many experience points the character has.
         [inventory] => A implementation of the Inventory class which contains information about what the player currently has.
-        [state_information] => Information about the current state, ie the location, current effects...etc. It's stored as a dictionary.
+        [state_information] => Information about the current state, ie the location, current effects...etc. It's stored as a dictionary. Also contains information about equiped weapons and armour.
         """
 
         self.name = name
@@ -377,6 +377,36 @@ class Player():
         self.xp -= subtraction
 
 
+class Inventory():
+    def __init__(self, items):
+        """
+        The Inventory Class:
+        - A way of storing the items the player currently has.
+
+        [items] => A list of all the items in a player's inventory, all Item classes.
+        """
+
+        self.items = items
+
+    def weapons(self):
+        return list(filter(lambda x: type(x) is Weapon, self.items))
+
+    def apparel(self):
+        return list(filter(lambda x: type(x) is Apparel, self.items))
+
+    def potions(self):
+        return list(filter(lambda x: type(x) is Potion, self.items))
+
+    def food(self):
+        return list(filter(lambda x: type(x) is Food, self.items))
+
+    def keys(self):
+        return list(filter(lambda x: type(x) is Key, self.items))
+
+    def spells(self):
+        return list(filter(lambda x: type(x) is Spell, self.items))
+
+
 class Item():
     def __init__(self, name, description, item_type, attributes):
         """
@@ -411,7 +441,7 @@ class Weapon(Item):
         - Represents an item which is a weapon. This means it can be used to create damage and is not a direct result of magic, like a spell.
 
         [attributes] => {
-            damage => the amount of damage that the weapon does.
+            damage => the amount of damage that the weapon does. Represented as a dice roll, like in DND.
             pickup_message => the message printed on the screen when the user first gets the weapon.
             luck => a value that messes with how likely an action is to proceed. This should correlate with the name. So a weapon called "God-Like Axe" should be luckier than "Shabby Dagger".
             success_action_phrases => a list of phrases that are said when the user successfully makes an action with the weapon.
@@ -511,18 +541,6 @@ class Spell(Item):
             attributes=attributes
         )
 
-
-class Inventory():
-    def __init__(self, items):
-        """
-        The Inventory Class:
-        - A way of storing the items the player currently has.
-
-        [items] => A list of all the items in a player's inventory, all Item classes.
-        """
-
-        self.items = items
-
 #########################
 
 ### PARSING ###
@@ -548,6 +566,20 @@ def parse_dict_to_class(data):
             }
         )
 
+    if data["type"] == "apparel":
+        return Apparel(
+            name=data["name"],
+            description=data["description"],
+            attributes={
+                "rating": data["attributes"]["rating"],
+                "pickup_message": data["attributes"]["pickup_message"],
+                "luck": data["attributes"]["luck"],
+                "success_action_phrases": data["attributes"]["success_action_phrases"],
+                "failure_action_phrases": data["attributes"]["failure_action_phrases"],
+                "xp_level": data["attributes"]["xp_level"]
+            }
+        )
+
 
 def parse_json_item_list_to_list(path):
     data = parse_json(path)
@@ -560,6 +592,24 @@ def parse_json_item_list_to_list(path):
 
 ###############
 
+### TESTING FUNCTIONs ###
+
+
+def print_weapon(weapon):
+    display("Name: {}".format(weapon.name))
+    display("Description: {}".format(weapon.description))
+
+    print("")
+
+    display("Pickup Message: '{}'".format(weapon.attributes["pickup_message"]))
+    display("Successful Action: '{}'".format(weapon.get_success_phrase()))
+    display("Pickup Message: '{}'".format(weapon.get_failure_phrase()))
+
+    print("")
+
+    display("Luck: {}".format(weapon.attributes["luck"]))
+    display("XP Level: {}".format(weapon.attributes["xp_level"]))
+
 ### PROGRAM START ###
 
 
@@ -568,29 +618,9 @@ if __name__ == "__main__":
         # Should call a single function, main().
         weapons = (parse_json_item_list_to_list("data/weapons.json"))
 
-        write_text(weapons[0].name + ":")
-        write_text(weapons[0].description)
-
-        print("")
-
-        write_text("'{}'".format(weapons[0].get_pickup_message()))
-        write_text("'{}'".format(weapons[0].get_success_phrase()))
-        write_text("'{}'".format(weapons[0].get_failure_phrase()))
-
-        print("")
-
-        write_text("=================")
-
-        print("")
-
-        write_text(weapons[1].name + ":")
-        write_text(weapons[1].description)
-
-        print("")
-
-        write_text("'{}'".format(weapons[1].get_pickup_message()))
-        write_text("'{}'".format(weapons[1].get_success_phrase()))
-        write_text("'{}'".format(weapons[1].get_failure_phrase()))
+        for w in weapons:
+            print_weapon(w)
+            print("\n")
 
     except KeyboardInterrupt:
         program_close()
