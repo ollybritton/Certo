@@ -1,0 +1,50 @@
+{
+  "Bat Claw": {
+    "name": "Bat Claw",
+    "type": "weapon",
+    "description": "In a quick flash of movement you catch a glance of the claws that this creature wields. They're a rotten yellow colour, and although they look blunt, you get the feeling that with enough force you could be hurt quite a lot.",
+    "attributes": {
+      "damage": "1d2",
+      "luck": 20,
+      "success_action_phrases": [
+        "The claws glide into your arm, staggering you for a second."
+      ],
+      "failure_action_phrases": [
+        "The claws swish past you in a sound of what you'd imagine 'luck' is like."
+      ]
+    }
+  },
+
+  "Bat Teeth": {
+    "name": "Bat Teeth",
+    "type": "weapon",
+    "description": "You manage to catch a small sight of the small sharp teeth.",
+    "attributes": {
+      "damage": "1d2",
+      "luck": 20,
+      "success_action_phrases": [
+        "The teeth fall into your arm, staggering you for a second."
+      ],
+      "failure_action_phrases": [
+        "You manage to duck out of the way of the teeth."
+      ]
+    }
+  },
+
+  "Bat Recover": {
+    "name": "Bat Recover",
+    "type": "ability",
+    "description": "The bat lingers for a second, retreating, presumably to recover.",
+    "attributes": {
+      "type": "heal",
+      "success_rate": 0.6,
+      "health_gain": "1d2",
+      "success_action_phrases": [
+        "After a few seconds, the bat glides back toward you with newfound strength."
+      ],
+      "failure_action_phrases": [
+        "The bat glides back to you before, but you can see it hasn't recovered."
+      ]
+    }
+  }
+}

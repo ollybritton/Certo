@@ -555,32 +555,15 @@ class Spell(Item):
 
 
 class Enemy():
-    def __init__(self, name, description, health, mana, hardness, attacks, buffs, state_information):
-        """
-        The Enemy Class:
-        - Represents an enemy that a player might fight. Different from a player in a number of ways.
-
-        [name] => The name of the enemy, stored as a string.
-        [description] => A description of the enemy, stored as a string.
-        [health] => A measure of how many more damage the enemy can take before dying. Stored as a list with two items,the first being the current amount of health, and the second the maxium amount of health.
-        [mana] => Similar to health, how much "magical health" the enemy has. Once again, a list with two items, the first the current amount of mana and the second being the maximum amount of mana.
-        [hardness] => A measure of how difficult the enemy is to fight. This influences the base reaction times that are given, and a higher number shortens the time allowed.
-        [attacks] => Similar to an inventory, but instead a list of attacks, not weapons.
-        [buffs] => Similar to an inventory, stores things that might buff the enemy, for example it healing itself.
-        [state_information] => Stores additional information about the current state of the enemy.
-        """
-
+    def __init__(self, name, description, health, mana, hardness, attacks, abilities):
         self.name = name
         self.description = description
         self.health = health
         self.mana = mana
-
         self.hardness = hardness
 
         self.attacks = attacks
-        self.buffs = buffs
-
-        self.state_information = state_information
+        self.abilities = abilities
 
     # === Health Functions === #
 
@@ -669,74 +652,20 @@ class Enemy():
         return time * self.hardness_multiplier()
 
 
-class Attacks():
-    def __init__(self, attacks):
-        """
-        The Attacks Class:
-        Stores the different attacks (things that do damage in a way) that an enemy can perform.
-
-        [attacks] => A list of the different types of attack the enemy can do.
-        """
-
-        self.attacks = attacks
-
-
 class EnemyWeapon():
-    def __init__(self, name, description, damage, success_action_phrases, failure_action_phrases, luck):
-        """
-        The EnemyWeapon class:
-        - Stores an attack which involves a melee weapon that can be used by an enemy to a player.
-
-        [name] => The name of a weapon, represented by a string.
-        [description] => The description of the weapon that the enemy is using. Written from the player's point of view.
-        [damage] => The amount of damage the weapon does, represented by a dice roll string. For example, "1d6" or "12d20".
-        [success_action_phrases] => Phrases which describe to the player what happens when an attack using the weapon is a success.
-        [failure_action_phrases] => Phrases which describe to the player what happens when an attack using the weapon fails.
-        [luck] => A numerical value that influences how likely an attack is to succeed using this weapon.
-        """
-
+    def __init__(self, name, description, damage, phrases, luck):
         self.name = name
         self.description = description
+        self.damage = list(map(lambda x: int(x), damage.split("d")))
 
-        self.damage = damage
-        self.success_action_phrases = success_action_phrases
-        self.failure_action_phrases = failure_action_phrases
+        self.phrases = {
+            "success": phrases[0],
+            "failure": phrases[1]
+        }
 
         self.luck = luck
 
-    def get_damage(self):
-        dice = self.damage.split("d")
-        results = []
-
-        for i in range(dice[0]):
-            results.append(random.randint(1, dice[1]))
-
-        return sum(results)
-
-    def get_success_phrase(self):
-        return random.choice(self.success_action_phrases)
-
-    def get_failure_phrase(self):
-        return random.choice(self.failure_action_phrases)
-
-
-class EnemySpell():
-    # TODO: Create EnemySpell class.
-    pass
-
-
-class Buffs():
-    def __init__(self, buffs):
-        """
-        The Buffs Class:
-        Stores the different buffs the enemy can give to itself, such as healing.
-
-        [buffs] => A list of the different buffs.
-        """
-
-        self.buffs = buffs
-
-        # TODO: Create buffs for healing and whatnot.
+    # TODO: Implement helper methods for the EnemyWeapon class.
 
 #########################
 
@@ -748,61 +677,100 @@ def parse_json(path):
         return json.loads(f.read())
 
 
-def parse_dict_to_class(data):
+def parse_enemy_feature(path_indicator):
+    path = path_indicator.split(":")[0]
+    name = path_indicator.split(":")[1]
+
+    data = parse_json(path)[name]
+
     if data["type"] == "weapon":
-        return Weapon(
+        return EnemyWeapon(
             name=data["name"],
             description=data["description"],
-            attributes={
-                "damage": data["attributes"]["damage"],
-                "pickup_message": data["attributes"]["pickup_message"],
-                "luck": data["attributes"]["luck"],
-                "success_action_phrases": data["attributes"]["success_action_phrases"],
-                "failure_action_phrases": data["attributes"]["failure_action_phrases"],
-                "xp_level": data["attributes"]["xp_level"]
-            }
+            damage=data["attributes"]["damage"],
+            phrases=[data["attributes"]["success_action_phrases"], data["attributes"]["failure_action_phrases"]],
+            luck=data["attributes"]["luck"]
         )
 
-    if data["type"] == "apparel":
-        return Apparel(
-            name=data["name"],
-            description=data["description"],
-            attributes={
-                "rating": data["attributes"]["rating"],
-                "pickup_message": data["attributes"]["pickup_message"],
-                "luck": data["attributes"]["luck"],
-                "success_action_phrases": data["attributes"]["success_action_phrases"],
-                "failure_action_phrases": data["attributes"]["failure_action_phrases"],
-                "xp_level": data["attributes"]["xp_level"]
-            }
-        )
-
-    if data["type"] == "enemy":
-        return Enemy(
-            name=data["name"],
-            description=data["description"],
-            health=[data["health"], data["health"]],
-            mana=[data["mana"], data["mana"]],
-            hardness=data["hardness"],
-            attacks=Attacks([]),
-            buffs=Buffs([]),
-            state_information={}
-        )
+    elif data["type"] == "ability":
+        if data["attributes"]["type"] == "heal":
+            # TODO Add different types (involves implementing an ability class)
+            pass
 
 
-def parse_json_item_list_to_list(path):
-    data = parse_json(path)
-    result = []
+def parse_enemy(path_indicator):
+    path = path_indicator.split(":")[0]
+    name = path_indicator.split(":")[1]
 
-    for item in data["items"]:
-        result.append(parse_dict_to_class(item))
+    data = parse_json(path)[name]
 
-    return result
+    features = data["features"]
+
+    for feature in features:
+        feature["location"], path_indicator = feature["location"].split(":"), feature["location"]
+
+        weapon_path = feature["location"][0]
+        weapon_name = feature["location"][1]
+
+        weapon = parse_enemy_feature(path_indicator)
+
+        feature["data"] = weapon
+
+    attacks = [f for f in features if f["type"] == "weapon"]
+    abilities = [f for f in features if f["type"] == "ability"]
+
+    return Enemy(
+        name=data["name"],
+        description=data["description"],
+        health=data["health"],
+        mana=data["mana"],
+        hardness=data["hardness"],
+        attacks=attacks,
+        abilities=abilities
+    )
+
+
+def parse_player_weapon(path_indicator):
+    path = path_indicator.split(":")[0]
+    name = path_indicator.split(":")[1]
+
+    data = parse_json(path)[name]
+    attr = data["attributes"]
+
+    return Weapon(
+    name = data["name"],
+    description=data["description"],
+    attributes=attr
+    )
 
 ###############
 
 ### FIGHT FUNCTIONS ###
 
+def question(hardness, player, enemy, help = False):
+    question_type = random.choice(["math", "memory", "spelling"])
+
+    if help == True:
+        write_text("Fight Tutorial:")
+        write_text("Since this is your first fight, you'll probably need some explanation of how it works.\n")
+
+        write_text("In essence, the core concept boils down to you answering questions under the pressure of a time limit.\n")
+
+        write_text("There are 3 different types of question:")
+        print("")
+        write_text("- Math, where you have to answer mathematical questions within a time limit or your action fails."])
+        write_text("- Memory, where you are shown a number or a piece of text and you then have to re-write it from memory, all under the pressure of time."])
+        write_text("- Spelling, where you are quickly flashed a word and then asked how it is spelt, in the shortest amount of time possible.")
+        print("")
+
+    if question_type == "math":
+        pass
+
+    elif question_type == "memory":
+        pass
+
+    elif question_type == "spelling":
+        pass
 
 def fight(player, enemy):
     """
@@ -824,13 +792,36 @@ def fight(player, enemy):
     + Equip - Equip a different spell/weapon.
     + Use - Attempt to use a potion or something similar.
     """
+    # I'm going to take a reflex approach
+    # CURRENT_TURN = random.choice([player, enemy])
+    # WAITING_TURN = [t for t in [player, enemy] if t != CURRENT_TURN][0]
+
+    CURRENT_TURN = player
+    WAITING_TURN = enemy
+
+    CURRENT_TURN = 0
+
+    write_text(enemy.description)
+    input("\nPress <ENTER> to continue.")
+
+    while not (player.health < 0 or enemy.health < 0):
+        if CURRENT_TURN == player:
+            # It's the player's turn.
+            if CURRENT_TURN == 0:
+                write_text(enemy.description)
+
+        elif CURRENT_TURN == enemy:
+            # It's the enemy's turn.
+            pass
+
+        CURRENT_TURN += 1
 
 #######################
 
 ### TESTING FUNCTIONs ###
 
 
-def print_weapon(weapon, write_mode=False):
+def print_player_weapon(weapon, write_mode=False):
     if not write_mode:
         display("Name: {}".format(weapon.name))
         display("Description: {}".format(weapon.description))
@@ -893,11 +884,18 @@ def print_weapon(weapon, write_mode=False):
 if __name__ == "__main__":
     try:
         # Should call a single function, main().
-        enemies = (parse_json_item_list_to_list("data/enemies.json"))
+        enemy = parse_enemy("data/enemy_data/enemies.json:Cave Bat")
+        player = Player(
+        name="Olly",
+        health=20,
+        mana=20,
+        xp=0,
+        inventory=Inventory([parse_player_weapon("data/player_data/weapons.json:Your Fists")]),
+        state_information={}
+        )
 
-        for e in enemies:
-            print(e)
-            print("\n")
+
+        question(1, player, enemy, True)
 
     except KeyboardInterrupt:
         program_close()

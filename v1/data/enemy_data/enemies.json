@@ -1,0 +1,38 @@
+{
+  "Cave Bat": {
+    "name": "Cave Bat",
+    "first_encounter": "In an instant a small black figure comes spiralling toward you, weaving past obstacles. You feel the need to dodge out the way.",
+    "description": "A small black bat.",
+    "health": 10,
+    "mana": 0,
+    "hardness": 0,
+    "features": [{
+        "name": "Bat Claw",
+        "type": "Weapon",
+        "location": "data/enemy_data/features.json:Bat Claw",
+        "probability": 0.7,
+        "rules": [
+          "h>3"
+        ]
+      },
+      {
+        "name": "Bat Teeth",
+        "type": "Weapon",
+        "location": "data/enemy_data/features.json:Bat Teeth",
+        "probability": 0.3,
+        "rules": [
+          "h>3"
+        ]
+      },
+      {
+        "name": "Recover",
+        "type": "Ability",
+        "location": "data/enemy_data/features.json:Bat Recover",
+        "probability": 0.6,
+        "rules": [
+          "h<3"
+        ]
+      }
+    ]
+  }
+}
