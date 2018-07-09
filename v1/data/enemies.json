@@ -1,0 +1,11 @@
+{
+    "type": "enemy",
+    "items": [{
+        "type": "enemy",
+        "name": "Cave Bat",
+        "description": "A bat that lingers in a cave.",
+        "health": 10,
+        "mana": 0,
+        "hardness": 0
+    }]
+}

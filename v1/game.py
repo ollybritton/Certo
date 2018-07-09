@@ -1,4 +1,4 @@
-# Certo v1, a simple text adventure game.
+# Certo v1, a text adventure game.
 
 import cmd
 import sys
@@ -264,6 +264,8 @@ def program_close():
 
 ### CLASS DEFENITIONS ###
 
+## PLAYER & INVENTORY ###
+
 
 class Player():
     def __init__(self, name, health, mana, xp, inventory, state_information):
@@ -458,7 +460,13 @@ class Weapon(Item):
         )
 
     def get_damage(self):
-        return self.attributes["damage"]
+        dice = self.attributes["damage"].split("d")
+        results = []
+
+        for i in range(dice[0]):
+            results.append(random.randint(1, dice[1]))
+
+        return sum(results)
 
     def get_pickup_message(self):
         return self.attributes["pickup_message"]
@@ -543,6 +551,195 @@ class Spell(Item):
 
 #########################
 
+### ENEMIES ###
+
+
+class Enemy():
+    def __init__(self, name, description, health, mana, hardness, attacks, buffs, state_information):
+        """
+        The Enemy Class:
+        - Represents an enemy that a player might fight. Different from a player in a number of ways.
+
+        [name] => The name of the enemy, stored as a string.
+        [description] => A description of the enemy, stored as a string.
+        [health] => A measure of how many more damage the enemy can take before dying. Stored as a list with two items,the first being the current amount of health, and the second the maxium amount of health.
+        [mana] => Similar to health, how much "magical health" the enemy has. Once again, a list with two items, the first the current amount of mana and the second being the maximum amount of mana.
+        [hardness] => A measure of how difficult the enemy is to fight. This influences the base reaction times that are given, and a higher number shortens the time allowed.
+        [attacks] => Similar to an inventory, but instead a list of attacks, not weapons.
+        [buffs] => Similar to an inventory, stores things that might buff the enemy, for example it healing itself.
+        [state_information] => Stores additional information about the current state of the enemy.
+        """
+
+        self.name = name
+        self.description = description
+        self.health = health
+        self.mana = mana
+
+        self.hardness = hardness
+
+        self.attacks = attacks
+        self.buffs = buffs
+
+        self.state_information = state_information
+
+    # === Health Functions === #
+
+    def set_health(self, new):
+        # Sets the current health.
+        self.health[0] = new
+
+    def set_max_health(self, new):
+        # Updates the maximum health an enemy can have.
+        self.health[1] = new
+
+    def add_health(self, addition):
+        # Adds a certain number (addition) to the current health. In the event that it's greater than the max health, then it is capped at the health limit.
+        self.health[0] += addition
+
+        if self.health[0] > self.health[1]:
+            self.health[0] = self.health[1]
+
+    def remove_health(self, subtraction):
+        # Removes a certain amount (subtraction) from the health. In the event that it's less than 0, the health is stopped at 0.
+        self.health[0] -= subtraction
+
+        if self.health[0] < 0:
+            self.health[0] = 0
+
+    def decimal_health_percentage(self):
+        # Returns the percentage of the max health that is the current health. In decimal form.
+        return float(self.health[0])/float(self.health[1])
+
+    def string_health_percentage(self, dp=0):
+        # Returns the percentage of the max health that is the current health in the range 0 to 100. Takes into account a desired amount of decimal places.
+        result = str(round(self.decimal_health_percentage()
+                           * 100 * (10 ** dp)) / (10 ** dp))
+
+        if dp is 0:
+            # Remove trailing ".0" if 0 decimal places are requested.
+            result = result[:len(result) - 2]
+
+        return result
+
+    # === Mana Functions === #
+
+    def set_mana(self, new):
+        # Sets the current mana.
+        self.mana[0] = new
+
+    def set_max_mana(self, new):
+        # Updates the maximum mana an enemy can have.
+        self.mana[1] = new
+
+    def add_mana(self, addition):
+        # Adds a certain number (addition) to the current mana. In the event that it's greater than the max mana, then it is capped at the mana limit.
+        self.mana[0] += addition
+
+        if self.health[0] > self.mana[1]:
+            self.mana[0] = self.mana[1]
+
+    def remove_mana(self, subtraction):
+        # Removes a certain amount (subtraction) from the mana. In the event that it's less than 0, the mana is stopped at 0.
+        self.mana[0] -= subtraction
+
+        if self.mana[0] < 0:
+            self.mana[0] = 0
+
+    def decimal_mana_percentage(self):
+        # Returns the percentage of the max mana that is the current mana. In decimal form.
+        return float(self.mana[0])/float(self.mana[1])
+
+    def string_mana_percentage(self, dp=0):
+        # Returns the percentage of the max mana that is the current mana in the range 0 to 100. Takes into account a desired amount of decimal places.
+        result = str(round(self.decimal_mana_percentage()
+                           * 100 * (10 ** dp)) / (10 ** dp))
+
+        if dp is 0:
+            # Remove trailing ".0" if 0 decimal places are requested.
+            result = result[:len(result) - 2]
+
+        return result
+
+    # === Hardness Functions === #
+
+    def hardness_multiplier(self):
+        return 1.0 - self.hardness
+
+    def adjusted_time(self, time):
+        return time * self.hardness_multiplier()
+
+
+class Attacks():
+    def __init__(self, attacks):
+        """
+        The Attacks Class:
+        Stores the different attacks (things that do damage in a way) that an enemy can perform.
+
+        [attacks] => A list of the different types of attack the enemy can do.
+        """
+
+        self.attacks = attacks
+
+
+class EnemyWeapon():
+    def __init__(self, name, description, damage, success_action_phrases, failure_action_phrases, luck):
+        """
+        The EnemyWeapon class:
+        - Stores an attack which involves a melee weapon that can be used by an enemy to a player.
+
+        [name] => The name of a weapon, represented by a string.
+        [description] => The description of the weapon that the enemy is using. Written from the player's point of view.
+        [damage] => The amount of damage the weapon does, represented by a dice roll string. For example, "1d6" or "12d20".
+        [success_action_phrases] => Phrases which describe to the player what happens when an attack using the weapon is a success.
+        [failure_action_phrases] => Phrases which describe to the player what happens when an attack using the weapon fails.
+        [luck] => A numerical value that influences how likely an attack is to succeed using this weapon.
+        """
+
+        self.name = name
+        self.description = description
+
+        self.damage = damage
+        self.success_action_phrases = success_action_phrases
+        self.failure_action_phrases = failure_action_phrases
+
+        self.luck = luck
+
+    def get_damage(self):
+        dice = self.damage.split("d")
+        results = []
+
+        for i in range(dice[0]):
+            results.append(random.randint(1, dice[1]))
+
+        return sum(results)
+
+    def get_success_phrase(self):
+        return random.choice(self.success_action_phrases)
+
+    def get_failure_phrase(self):
+        return random.choice(self.failure_action_phrases)
+
+
+class EnemySpell():
+    # TODO: Create EnemySpell class.
+    pass
+
+
+class Buffs():
+    def __init__(self, buffs):
+        """
+        The Buffs Class:
+        Stores the different buffs the enemy can give to itself, such as healing.
+
+        [buffs] => A list of the different buffs.
+        """
+
+        self.buffs = buffs
+
+        # TODO: Create buffs for healing and whatnot.
+
+#########################
+
 ### PARSING ###
 
 
@@ -580,6 +777,18 @@ def parse_dict_to_class(data):
             }
         )
 
+    if data["type"] == "enemy":
+        return Enemy(
+            name=data["name"],
+            description=data["description"],
+            health=[data["health"], data["health"]],
+            mana=[data["mana"], data["mana"]],
+            hardness=data["hardness"],
+            attacks=Attacks([]),
+            buffs=Buffs([]),
+            state_information={}
+        )
+
 
 def parse_json_item_list_to_list(path):
     data = parse_json(path)
@@ -592,23 +801,91 @@ def parse_json_item_list_to_list(path):
 
 ###############
 
+### FIGHT FUNCTIONS ###
+
+
+def fight(player, enemy):
+    """
+    Triggers a fight between a player and an enemy.
+
+    Fights are quite unique in this game. The enemy's chance of succeeding are based purely on chance, but the player's are measured in their ability to think under pressure.
+
+    There are three types of questions:
+    + Math - Questions like "59 + 23".
+    + Memory - Questions like "What was that number I just showed you?"
+    + Spelling - Questions like "How do you spell that word I just showed you?"
+
+    The player is timed in how long it takes them to answer. If they take a long time to answer, it's likely their action won't succeed. If they do so very quickly, then they do.
+
+    There are several actions that the player can perform inside a fight. These are:
+    + Inpect - Find out the enemy's true health, instead of just an indicator like "It's pretty beat up."
+    + Attack/Fight - Use the currently equiped weapon/spell to try and do some damage to the enemy.
+    + Heal - Attempt to restore one's own health.
+    + Equip - Equip a different spell/weapon.
+    + Use - Attempt to use a potion or something similar.
+    """
+
+#######################
+
 ### TESTING FUNCTIONs ###
 
 
-def print_weapon(weapon):
-    display("Name: {}".format(weapon.name))
-    display("Description: {}".format(weapon.description))
+def print_weapon(weapon, write_mode=False):
+    if not write_mode:
+        display("Name: {}".format(weapon.name))
+        display("Description: {}".format(weapon.description))
 
-    print("")
+        print("")
 
-    display("Pickup Message: '{}'".format(weapon.attributes["pickup_message"]))
-    display("Successful Action: '{}'".format(weapon.get_success_phrase()))
-    display("Pickup Message: '{}'".format(weapon.get_failure_phrase()))
+        display("Pickup Message: '{}'".format(
+            weapon.attributes["pickup_message"]))
+        display("Successful Action: '{}'".format(weapon.get_success_phrase()))
+        display("Pickup Message: '{}'".format(weapon.get_failure_phrase()))
 
-    print("")
+        print("")
 
-    display("Luck: {}".format(weapon.attributes["luck"]))
-    display("XP Level: {}".format(weapon.attributes["xp_level"]))
+        display("Luck: {}".format(weapon.attributes["luck"]))
+        display("XP Level: {}".format(weapon.attributes["xp_level"]))
+
+    else:
+        write_text("Name: {}".format(weapon.name))
+        write_text("Description: {}".format(weapon.description))
+
+        print("")
+
+        write_text("Pickup Message: '{}'".format(
+            weapon.attributes["pickup_message"])
+        )
+
+        write_text("Successful Action: '{}'".format(
+            weapon.get_success_phrase())
+        )
+
+        write_text("Pickup Message: '{}'".format(weapon.get_failure_phrase()))
+
+        print("")
+
+        write_text("Luck: {}".format(weapon.attributes["luck"]))
+        write_text("XP Level: {}".format(weapon.attributes["xp_level"]))
+        write_text("Name: {}".format(weapon.name))
+        write_text("Description: {}".format(weapon.description))
+
+        print("")
+
+        write_text("Pickup Message: '{}'".format(
+            weapon.attributes["pickup_message"])
+        )
+
+        write_text("Successful Action: '{}'".format(
+            weapon.get_success_phrase())
+        )
+
+        write_text("Pickup Message: '{}'".format(weapon.get_failure_phrase()))
+
+        print("")
+
+        write_text("Luck: {}".format(weapon.attributes["luck"]))
+        write_text("XP Level: {}".format(weapon.attributes["xp_level"]))
 
 ### PROGRAM START ###
 
@@ -616,10 +893,10 @@ def print_weapon(weapon):
 if __name__ == "__main__":
     try:
         # Should call a single function, main().
-        weapons = (parse_json_item_list_to_list("data/weapons.json"))
+        enemies = (parse_json_item_list_to_list("data/enemies.json"))
 
-        for w in weapons:
-            print_weapon(w)
+        for e in enemies:
+            print(e)
             print("\n")
 
     except KeyboardInterrupt:

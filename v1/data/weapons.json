@@ -1,6 +1,30 @@
 {
     "type": "weapon",
     "items": [{
+            "name": "Your Fists",
+            "type": "weapon",
+            "description": "These look horrible. They're covered in mud, probably because you haven't washed your hands or showered in weeks.",
+            "attributes": {
+                "damage": "1d2",
+                "pickup_message": "You've acquired: Your fists. You look down at them with a string sense of «presque vu», as they seem completely new and unreal to you.",
+                "luck": 20,
+                "success_action_phrases": [
+                    "With a poweful arc, you lift up your fists and swing them into the enemy.",
+                    "With a small amount of strength you manage to lift up the things on the end of your arm, and send them crazily hurling towards the enemy.",
+                    "With a *POW* you slam your fist into your enemy, and you feel that it probably hurts your fists more to hit the enemy than the enemy actually gets hurt.",
+                    "Quickly, you just manage to hurl your fists into the enemy."
+                ],
+                "failure_action_phrases": [
+                    "You attempt to hit the enemy, but you just miss it.",
+                    "Not much can go wrong when you hit stuff with your fists, but somehow, you manage to make it so. You try a powerful swing, but the enemy dodges just in time.",
+                    "You do manage to land a hit with your fists, but there isn't enough force behind it to do any damage.",
+                    "When you hit the target, you hear a distinct click. But that wasn't your enemy, that was your hand.",
+                    "Flailing your arm like a madman, you don't hit anything."
+                ],
+                "xp_level": 10
+            }
+        },
+        {
             "name": "Shoddy Dagger",
             "type": "weapon",
             "description": "This dagger is really, really poorly made. You swear that the blade wiggles around when you shake it.",
@@ -12,13 +36,16 @@
                     "The floppy blade just manages to pierce the flesh of your enemy.",
                     "In all its shoddyness, the dagger just finds place inside your enemy.",
                     "The blade flops into the enemy with a satisfying slap noise, before being quickly retracted.",
-                    "It just manages to stab the enemy."
+                    "It just manages to stab the enemy.",
+                    "With a not-so-satisfying *plip*, the blade lightly sinks into the enemy.",
+                    "The blunt blade, with a push, falls into the enemy."
                 ],
                 "failure_action_phrases": [
                     "It's pretty hard to hit anything with this dagger, it's flopping about the entire time.",
-                    "You try to go for a stab, but the blade basically hinges to the side and the blunt part of the blade pushes up against the enemy.",
+                    "You try to go for a stab, but the blade flops to the side and the blunt part of the blade pushes up against the enemy.",
                     "The blade just misses the target, flopping all over the place.",
                     "I mean the dagger does basically no damage anyway, but you might as well try and hit something with it.",
+                    "Flailing your arm like a madman, you don't hit anything."
                 ],
                 "xp_level": 10
             }
@@ -26,21 +53,23 @@
         {
             "name": "Shoddy Greatsword",
             "type": "weapon",
-            "description": "The sword looks like it was made by a three year old on a sugar rush. It's incredibly top heavy, part of the handle has fallen off so it's hard to grip and it's so blunt and fragile you swear if you try to cut a tomato with it, the tomato would probably cut the blade.",
+            "description": "The sword looks like it was made by a three year old on a sugar rush. It's incredibly top heavy, part of the handle has fallen off so it's hard to grip and it's so blunt and fragile you swear if you were to try to cut a tomato with it, the tomato would probably cut the blade.",
             "attributes": {
                 "damage": "2d6",
                 "pickup_message": "When you pick up the sword, you really wish you had something slightly better. Maybe at least something that could possible actually hurt something.",
-                "luck": 15,
-                HEY OLLY YES OLLY YOU NEED TO WRITE THE "success_action_phrases"
-                and the "failure_action_phrases"
-                OK "success_action_phrases": [
-                    "With a cold, slick motion, the blade cuts into the enemy with a serene sharpness.",
-                    "The black blade vanishes into the enemy before quickly being drawn out in a moment of tension."
+                "luck": 8,
+                "success_action_phrases": [
+                    "Suprisingly, the massive poorly-crafted blade finds purchase, and it gently hits into the enemy. Not very far in of course, but it still does some damage.",
+                    "That's strange. The blade actually hit something!",
+                    "Swinging the sword in a full, wobbly arc, you just manage to hit something.",
+                    "The great blade falls down in the enemy, slightly off target as a result of all the wobbling."
                 ],
                 "failure_action_phrases": [
-                    "The blade just misses the target."
+                    "Unsuprisingly, the massive poorly-made flops around, not hitting the enemy.",
+                    "With a delighful swing, you don't hit anything.",
+                    "Seriously, come on. The blade is massive. You might as well hit something with it."
                 ],
-                "xp_level": 100
+                "xp_level": 10
             }
         }
     ]
